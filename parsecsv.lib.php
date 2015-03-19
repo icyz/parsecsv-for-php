@@ -862,15 +862,19 @@ class parseCSV {
         // create data
         foreach ($data as $key => $row) {
             foreach ($row as $field => $value) {
+                if ($this->convert_encoding) {
+                    $value_encoded = mb_convert_encoding($string, $this->output_encoding, $this->output_encoding); 
+                    if(strlen($value_encoded)!==0){
+                        $value_iconv = iconv($this->input_encoding, $this->output_encoding, $value);
+                        $value = (!$value_iconv) ? $value_iconv : $value;
+                    }
+                }
+                $value_iconv = false;
                 $entry[] = $this->_enclose_value($value, $delimiter);
             }
-
+                   
             $string .= implode($delimiter, $entry).$this->linefeed;
             $entry   = array();
-        }
-        
-        if ($this->convert_encoding) {
-            $string = iconv($this->input_encoding, $this->output_encoding, $string);
         }
 
         return $string;
